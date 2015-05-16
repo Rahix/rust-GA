@@ -1,0 +1,8 @@
+[package]
+
+name = "rust-GA"
+version = "0.0.1"
+authors = [ "Rahix" ]
+
+[dependencies]
+rand = "*"
