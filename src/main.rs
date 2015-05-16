@@ -10,13 +10,20 @@
 // R      UUUU SSSS     T         GGG  A   A
 //
 //
-// (Just for fun :)
+// ( I am NOT good with ascii arts D: )
 //
 // (c) Rahix
 extern crate rand;
 
 use std::io;
+use std::thread;
+use std::process;
 use rand::Rng;
+
+fn clear_screen()
+{
+    print!("\x1B[2J \x1B[0;0f");
+}
 
 fn fitness(individuum: &Vec<i32>) -> i32
 {
@@ -34,7 +41,7 @@ fn fitness(individuum: &Vec<i32>) -> i32
     fitness
 }
 
-fn print_population(population: Vec<Vec<i32> >)
+fn print_population(population: &Vec<Vec<i32> >)
 {
     let i_individuums = population.len();
     for i_i in 0..i_individuums
@@ -58,6 +65,70 @@ fn print_population(population: Vec<Vec<i32> >)
     }
 }
 
+fn mutation(individuum: &mut Vec<i32>)
+{
+    let random_point = rand::thread_rng().gen_range(0,80);
+    individuum[random_point] = rand::thread_rng().gen_range(0,100) % 2;
+}
+
+fn get_indiviuum(population: &Vec<Vec<i32> >, better: bool) -> usize
+{
+    // Generate two random numbers,
+    // if better is set, return the one with the better fitness,
+    // if better is false, return the one with worse fitness.
+    // This is used to simulate Darwins "Surviving of the fittest"
+    let num1 = rand::thread_rng().gen_range(0, population.len());
+    let num2 = rand::thread_rng().gen_range(0, population.len());
+    if better == true
+    {
+        if fitness(&population[num1]) >= fitness(&population[num2])
+        {
+            return num1;
+        }
+        else
+        {
+            return num2;
+        }
+    }
+    else
+    {
+        if fitness(&population[num1]) >= fitness(&population[num2])
+        {
+            return num2;
+        }
+        else
+        {
+            return num1;
+        }
+    }
+}
+
+fn simple_point_crossover_random(population: &mut Vec<Vec<i32> >)
+{
+    // Get two parents
+    let p1 = get_indiviuum(population, true);
+    let p2 = get_indiviuum(population, true);
+    // And one child
+    let child = get_indiviuum(population, false);
+    // Get random crossover point
+    let crossover_point = rand::thread_rng().gen_range(1, 79);
+    // Copy everything until the crossoverpoint into child. (From p1)
+    for i in 0..crossover_point
+    {
+        population[child][i] = population[p1][i];
+    }
+    // Copy everything after the crossoverpoint into child. (From p2)
+    for i in crossover_point..80
+    {
+        population[child][i] = population[p2][i];
+    }
+    // Do a random mutation
+    if rand::thread_rng().gen_range(0,100) % 2 == 1
+    {
+        mutation(&mut population[child]);
+    }
+}
+
 fn main()
 {
     let version = "0.0.1";
@@ -73,5 +144,12 @@ fn main()
             population[i_i][i_c] = rand::thread_rng().gen_range(0, 100) % 2;
         }
     }
-    print_population(population);
+    loop
+    {
+        clear_screen();
+        thread::sleep_ms(30);
+        simple_point_crossover_random(&mut population);
+        print_population(&population);
+        println!("Running . . . \t\t \x1B[34;1mPress CTRL-C to exit!\x1B[37;0m")
+    }
 }
