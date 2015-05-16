@@ -15,9 +15,7 @@
 // (c) Rahix
 extern crate rand;
 
-use std::io;
 use std::thread;
-use std::process;
 use rand::Rng;
 
 fn clear_screen()
@@ -51,7 +49,7 @@ fn print_population(population: &Vec<Vec<i32> >)
         let ref individuum = population[i_i];
         for i_c in 0..i_chromosomes
         {
-            if(individuum[i_c] == 1)
+            if individuum[i_c] == 1
             {
                 line = line + &"#".to_string();
             }
@@ -150,6 +148,6 @@ fn main()
         thread::sleep_ms(30);
         simple_point_crossover_random(&mut population);
         print_population(&population);
-        println!("Running . . . \t\t \x1B[34;1mPress CTRL-C to exit!\x1B[37;0m")
+        println!("Running . . . \t\t \x1B[32;1mPress CTRL-C to exit!\x1B[37;0m")
     }
 }
